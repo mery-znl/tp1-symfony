@@ -14,52 +14,52 @@ class PlaylistMedia
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $playlist_id = null;
-
-    #[ORM\Column]
-    private ?int $media_id = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $added_at = null;
+    private ?\DateTimeInterface $addedAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'playlistMedia')]
+    private ?Media $media = null;
+
+    #[ORM\ManyToOne(inversedBy: 'playlistMedia')]
+    private ?Playlist $playlist = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPlaylistId(): ?int
-    {
-        return $this->playlist_id;
-    }
-
-    public function setPlaylistId(int $playlist_id): static
-    {
-        $this->playlist_id = $playlist_id;
-
-        return $this;
-    }
-
-    public function getMediaId(): ?int
-    {
-        return $this->media_id;
-    }
-
-    public function setMediaId(int $media_id): static
-    {
-        $this->media_id = $media_id;
-
-        return $this;
-    }
-
     public function getAddedAt(): ?\DateTimeInterface
     {
-        return $this->added_at;
+        return $this->addedAt;
     }
 
-    public function setAddedAt(\DateTimeInterface $added_at): static
+    public function setAddedAt(\DateTimeInterface $addedAt): static
     {
-        $this->added_at = $added_at;
+        $this->addedAt = $addedAt;
+
+        return $this;
+    }
+
+    public function getMedia(): ?Media
+    {
+        return $this->media;
+    }
+
+    public function setMedia(?Media $media): static
+    {
+        $this->media = $media;
+
+        return $this;
+    }
+
+    public function getPlaylist(): ?Playlist
+    {
+        return $this->playlist;
+    }
+
+    public function setPlaylist(?Playlist $playlist): static
+    {
+        $this->playlist = $playlist;
 
         return $this;
     }

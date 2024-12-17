@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\SeasonsRepository;
+use App\Repository\SeasonRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SeasonsRepository::class)]
-class Seasons
+#[ORM\Entity(repositoryClass: SeasonRepository::class)]
+class Season
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -14,11 +14,11 @@ class Seasons
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?int $serie_id = null;
+    private ?int $season_number = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $season_number = null;
-
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?serie $serie_id = null;
     public function getId(): ?int
     {
         return $this->id;

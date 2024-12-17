@@ -14,67 +14,69 @@ class WatchHistory
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $user_id = null;
-
-    #[ORM\Column]
-    private ?int $media_id = null;
-
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $last_watched = null;
+    private ?\DateTimeInterface $lastWatchedAt = null;
 
     #[ORM\Column]
-    private ?int $number_of_views = null;
+    private ?int $numberOfViews = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $viewer = null;
+
+    #[ORM\ManyToOne(inversedBy: 'watchHistories')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Media $media = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUserId(): ?int
+    public function getLastWatchedAt(): ?\DateTimeInterface
     {
-        return $this->user_id;
+        return $this->lastWatchedAt;
     }
 
-    public function setUserId(int $user_id): static
+    public function setLastWatchedAt(\DateTimeInterface $lastWatchedAt): static
     {
-        $this->user_id = $user_id;
-
-        return $this;
-    }
-
-    public function getMediaId(): ?int
-    {
-        return $this->media_id;
-    }
-
-    public function setMediaId(int $media_id): static
-    {
-        $this->media_id = $media_id;
-
-        return $this;
-    }
-
-    public function getLastWatched(): ?\DateTimeInterface
-    {
-        return $this->last_watched;
-    }
-
-    public function setLastWatched(\DateTimeInterface $last_watched): static
-    {
-        $this->last_watched = $last_watched;
+        $this->lastWatchedAt = $lastWatchedAt;
 
         return $this;
     }
 
     public function getNumberOfViews(): ?int
     {
-        return $this->number_of_views;
+        return $this->numberOfViews;
     }
 
-    public function setNumberOfViews(int $number_of_views): static
+    public function setNumberOfViews(int $numberOfViews): static
     {
-        $this->number_of_views = $number_of_views;
+        $this->numberOfViews = $numberOfViews;
+
+        return $this;
+    }
+
+    public function getViewer(): ?User
+    {
+        return $this->viewer;
+    }
+
+    public function setViewer(?User $viewer): static
+    {
+        $this->viewer = $viewer;
+
+        return $this;
+    }
+
+    public function getMedia(): ?Media
+    {
+        return $this->media;
+    }
+
+    public function setMedia(?Media $media): static
+    {
+        $this->media = $media;
 
         return $this;
     }

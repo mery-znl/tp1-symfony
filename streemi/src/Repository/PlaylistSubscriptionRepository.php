@@ -2,18 +2,18 @@
 
 namespace App\Repository;
 
-use App\Entity\PlaylistSubscriptions;
+use App\Entity\PlaylistSubscription;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<PlaylistSubscriptions>
  */
-class PlaylistSubscriptionsRepository extends ServiceEntityRepository
+class PlaylistSubscriptionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, PlaylistSubscriptions::class);
+        parent::__construct($registry, PlaylistSubscription::class);
     }
 
 //    /**
