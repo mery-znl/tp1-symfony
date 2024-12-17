@@ -3,11 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\PlaylistsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PlaylistsRepository::class)]
-class Playlists
+class Playlist
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,6 +27,21 @@ class Playlists
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'playlists')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\ManyToMany(targetEntity: Media::class, inversedBy: 'playlists')]
+    private Collection $medias;
+
+    public function __construct()
+    {
+        $this->medias = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +92,42 @@ class Playlists
     public function setUpdatedAt(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMedias(): Collection
+    {
+        return $this->medias;
+    }
+
+    public function addMedia(Media $media): static
+    {
+        if (!$this->medias->contains($media)) {
+            $this->medias->add($media);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $media): static
+    {
+        $this->medias->removeElement($media);
 
         return $this;
     }

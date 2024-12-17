@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\MediaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -34,6 +36,17 @@ class Media
 
     #[ORM\Column]
     private array $cast = [];
+
+    /**
+     * @var Collection<int, Playlist>
+     */
+    #[ORM\ManyToMany(targetEntity: Playlist::class, mappedBy: 'medias')]
+    private Collection $playlists;
+
+    public function __construct()
+    {
+        $this->playlists = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -120,6 +133,33 @@ class Media
     public function setCast(array $cast): static
     {
         $this->cast = $cast;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Playlist>
+     */
+    public function getPlaylists(): Collection
+    {
+        return $this->playlists;
+    }
+
+    public function addPlaylist(Playlist $playlist): static
+    {
+        if (!$this->playlists->contains($playlist)) {
+            $this->playlists->add($playlist);
+            $playlist->addMedia($this);
+        }
+
+        return $this;
+    }
+
+    public function removePlaylist(Playlist $playlist): static
+    {
+        if ($this->playlists->removeElement($playlist)) {
+            $playlist->removeMedia($this);
+        }
 
         return $this;
     }

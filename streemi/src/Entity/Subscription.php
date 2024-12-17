@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\SubscriptionsRepository;
+use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SubscriptionsRepository::class)]
-class Subscriptions
+#[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
+class Subscription
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
