@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Episodes;
+use App\Entity\Episode;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Episodes>
+ * @extends ServiceEntityRepository<Episode>
  */
-class EpisodesRepository extends ServiceEntityRepository
+class EpisodeRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Episodes::class);
+        parent::__construct($registry, Episode::class);
     }
 
     //    /**
-    //     * @return Episodes[] Returns an array of Episodes objects
+    //     * @return Episode[] Returns an array of Episode objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class EpisodesRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Episodes
+    //    public function findOneBySomeField($value): ?Episode
     //    {
     //        return $this->createQueryBuilder('e')
     //            ->andWhere('e.exampleField = :val')

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PlaylistMediaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -14,14 +16,23 @@ class PlaylistMedia
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $addedAt = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $added_at = null;
 
-    #[ORM\ManyToOne(inversedBy: 'playlistMedia')]
-    private ?Media $media = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?playlist $playlist_id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'playlistMedia')]
-    private ?Playlist $playlist = null;
+    /**
+     * @var Collection<int, media>
+     */
+    #[ORM\ManyToMany(targetEntity: media::class)]
+    private Collection $media_id;
+
+    public function __construct()
+    {
+        $this->media_id = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -30,36 +41,48 @@ class PlaylistMedia
 
     public function getAddedAt(): ?\DateTimeInterface
     {
-        return $this->addedAt;
+        return $this->added_at;
     }
 
-    public function setAddedAt(\DateTimeInterface $addedAt): static
+    public function setAddedAt(?\DateTimeInterface $added_at): static
     {
-        $this->addedAt = $addedAt;
+        $this->added_at = $added_at;
 
         return $this;
     }
 
-    public function getMedia(): ?Media
+    public function getPlaylistId(): ?playlist
     {
-        return $this->media;
+        return $this->playlist_id;
     }
 
-    public function setMedia(?Media $media): static
+    public function setPlaylistId(?playlist $playlist_id): static
     {
-        $this->media = $media;
+        $this->playlist_id = $playlist_id;
 
         return $this;
     }
 
-    public function getPlaylist(): ?Playlist
+    /**
+     * @return Collection<int, media>
+     */
+    public function getMediaId(): Collection
     {
-        return $this->playlist;
+        return $this->media_id;
     }
 
-    public function setPlaylist(?Playlist $playlist): static
+    public function addMediaId(media $mediaId): static
     {
-        $this->playlist = $playlist;
+        if (!$this->media_id->contains($mediaId)) {
+            $this->media_id->add($mediaId);
+        }
+
+        return $this;
+    }
+
+    public function removeMediaId(media $mediaId): static
+    {
+        $this->media_id->removeElement($mediaId);
 
         return $this;
     }

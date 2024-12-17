@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\WatchHistoryRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -15,68 +17,87 @@ class WatchHistory
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $lastWatchedAt = null;
+    private ?\DateTimeInterface $last_watched = null;
 
     #[ORM\Column]
-    private ?int $numberOfViews = null;
+    private ?int $number_of_views = null;
 
-    #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $viewer = null;
+    /**
+     * @var Collection<int, Media>
+     */
+    #[ORM\ManyToMany(targetEntity: Media::class, inversedBy: 'watchHistories')]
+    private Collection $media_id;
 
-    #[ORM\ManyToOne(inversedBy: 'watchHistories')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Media $media = null;
+    private ?user $user_id = null;
+
+    public function __construct()
+    {
+        $this->media_id = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLastWatchedAt(): ?\DateTimeInterface
+    public function getLastWatched(): ?\DateTimeInterface
     {
-        return $this->lastWatchedAt;
+        return $this->last_watched;
     }
 
-    public function setLastWatchedAt(\DateTimeInterface $lastWatchedAt): static
+    public function setLastWatched(\DateTimeInterface $last_watched): static
     {
-        $this->lastWatchedAt = $lastWatchedAt;
+        $this->last_watched = $last_watched;
 
         return $this;
     }
 
     public function getNumberOfViews(): ?int
     {
-        return $this->numberOfViews;
+        return $this->number_of_views;
     }
 
-    public function setNumberOfViews(int $numberOfViews): static
+    public function setNumberOfViews(int $number_of_views): static
     {
-        $this->numberOfViews = $numberOfViews;
+        $this->number_of_views = $number_of_views;
 
         return $this;
     }
 
-    public function getViewer(): ?User
+    /**
+     * @return Collection<int, Media>
+     */
+    public function getMediaId(): Collection
     {
-        return $this->viewer;
+        return $this->media_id;
     }
 
-    public function setViewer(?User $viewer): static
+    public function addMediaId(Media $mediaId): static
     {
-        $this->viewer = $viewer;
+        if (!$this->media_id->contains($mediaId)) {
+            $this->media_id->add($mediaId);
+        }
 
         return $this;
     }
 
-    public function getMedia(): ?Media
+    public function removeMediaId(Media $mediaId): static
     {
-        return $this->media;
+        $this->media_id->removeElement($mediaId);
+
+        return $this;
     }
 
-    public function setMedia(?Media $media): static
+    public function getUserId(): ?user
     {
-        $this->media = $media;
+        return $this->user_id;
+    }
+
+    public function setUserId(?user $user_id): static
+    {
+        $this->user_id = $user_id;
 
         return $this;
     }

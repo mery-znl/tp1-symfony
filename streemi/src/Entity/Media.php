@@ -7,9 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\DiscriminatorColumn;
+use Doctrine\ORM\Mapping\DiscriminatorMap;
+use Doctrine\ORM\Mapping\InheritanceType;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
-class Media
+#[InheritanceType('JOINED')]
+#[DiscriminatorColumn(name: 'mediaType', type: 'string')]
+#[DiscriminatorMap(['movie' => Movie::class, 'serie' => Serie::class])] class Media
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -17,7 +22,7 @@ class Media
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $titre = null;
+    private ?string $title = null;
 
     #[ORM\Column(length: 255)]
     private ?string $short_description = null;
@@ -35,17 +40,32 @@ class Media
     private array $staff = [];
 
     #[ORM\Column]
-    private array $cast = [];
+    private array $caste = [];
 
     /**
-     * @var Collection<int, Playlist>
+     * @var Collection<int, WatchHistory>
      */
-    #[ORM\ManyToMany(targetEntity: Playlist::class, mappedBy: 'medias')]
-    private Collection $playlists;
+    #[ORM\ManyToMany(targetEntity: WatchHistory::class, mappedBy: 'media_id')]
+    private Collection $watchHistories;
+
+    /**
+     * @var Collection<int, Comment>
+     */
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'media_id')]
+    private Collection $comment;
+
+    #[ORM\ManyToOne(inversedBy: 'media_id')]
+    private ?CategoryMedia $categoryMedia = null;
+
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: "media")]
+    #[ORM\JoinTable(name: "category_media_category")]
+    private $categories;
 
     public function __construct()
     {
-        $this->playlists = new ArrayCollection();
+        $this->watchHistories = new ArrayCollection();
+        $this->comment = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -53,14 +73,14 @@ class Media
         return $this->id;
     }
 
-    public function getTitre(): ?string
+    public function getTitle(): ?string
     {
-        return $this->titre;
+        return $this->title;
     }
 
-    public function setTitre(string $titre): static
+    public function setTitle(string $title): static
     {
-        $this->titre = $titre;
+        $this->title = $title;
 
         return $this;
     }
@@ -125,41 +145,83 @@ class Media
         return $this;
     }
 
-    public function getCast(): array
+    public function getCaste(): array
     {
-        return $this->cast;
+        return $this->caste;
     }
 
-    public function setCast(array $cast): static
+    public function setCaste(array $caste): static
     {
-        $this->cast = $cast;
+        $this->caste = $caste;
 
         return $this;
     }
 
     /**
-     * @return Collection<int, Playlist>
+     * @return Collection<int, WatchHistory>
      */
-    public function getPlaylists(): Collection
+    public function getWatchHistories(): Collection
     {
-        return $this->playlists;
+        return $this->watchHistories;
     }
 
-    public function addPlaylist(Playlist $playlist): static
+    public function addWatchHistory(WatchHistory $watchHistory): static
     {
-        if (!$this->playlists->contains($playlist)) {
-            $this->playlists->add($playlist);
-            $playlist->addMedia($this);
+        if (!$this->watchHistories->contains($watchHistory)) {
+            $this->watchHistories->add($watchHistory);
+            $watchHistory->addMediaId($this);
         }
 
         return $this;
     }
 
-    public function removePlaylist(Playlist $playlist): static
+    public function removeWatchHistory(WatchHistory $watchHistory): static
     {
-        if ($this->playlists->removeElement($playlist)) {
-            $playlist->removeMedia($this);
+        if ($this->watchHistories->removeElement($watchHistory)) {
+            $watchHistory->removeMediaId($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComment(): Collection
+    {
+        return $this->comment;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comment->contains($comment)) {
+            $this->comment->add($comment);
+            $comment->setMediaId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comment->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getMediaId() === $this) {
+                $comment->setMediaId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getCategoryMedia(): ?CategoryMedia
+    {
+        return $this->categoryMedia;
+    }
+
+    public function setCategoryMedia(?CategoryMedia $categoryMedia): static
+    {
+        $this->categoryMedia = $categoryMedia;
 
         return $this;
     }

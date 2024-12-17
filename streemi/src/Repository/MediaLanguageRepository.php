@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\MediaLanguages;
+use App\Entity\MediaLanguage;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<MediaLanguages>
+ * @extends ServiceEntityRepository<MediaLanguage>
  */
-class MediaLanguagesRepository extends ServiceEntityRepository
+class MediaLanguageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, MediaLanguages::class);
+        parent::__construct($registry, MediaLanguage::class);
     }
 
     //    /**
-    //     * @return MediaLanguages[] Returns an array of MediaLanguages objects
+    //     * @return MediaLanguage[] Returns an array of MediaLanguage objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class MediaLanguagesRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?MediaLanguages
+    //    public function findOneBySomeField($value): ?MediaLanguage
     //    {
     //        return $this->createQueryBuilder('m')
     //            ->andWhere('m.exampleField = :val')

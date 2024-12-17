@@ -8,7 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+#[ORM\Table(name: '`user`')]
+class User
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,51 +25,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    private string $plainPassword = '';
-
     /**
-     * @var Collection<int, WatchHistory>
+     * @var Collection<int, subscription>
      */
-    #[ORM\OneToMany(targetEntity: WatchHistory::class, mappedBy: 'viewer')]
-    private Collection $watchHistories;
-
-    /**
-     * @var Collection<int, PlaylistSubscription>
-     */
-    #[ORM\OneToMany(targetEntity: PlaylistSubscription::class, mappedBy: 'subscriber')]
-    private Collection $playlistSubscriptions;
-
-    /**
-     * @var Collection<int, Playlist>
-     */
-    #[ORM\OneToMany(targetEntity: Playlist::class, mappedBy: 'creator')]
-    private Collection $playlists;
-
-    /**
-     * @var Collection<int, SubscriptionHistory>
-     */
-    #[ORM\OneToMany(targetEntity: SubscriptionHistory::class, mappedBy: 'subscriber')]
-    private Collection $subscriptionHistorie;
-
-    /**
-     * @var Collection<int, Comment>
-     */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'publisher')]
-    private Collection $comments;
-
-    #[ORM\Column(enumType: UserAccountStatusEnum::class, options: ['default' => UserAccountStatusEnum::INACTIVE])]
-    private ?UserAccountStatusEnum $accountStatus = null;
-
-    #[ORM\Column(type: 'json', nullable: false, options: ['default' => '["ROLE_USER"]'])]
-    private array $roles = [];
+    #[ORM\OneToMany(targetEntity: subscription::class, mappedBy: 'subscriber')]
+    private Collection $current_subscription_id;
 
     public function __construct()
     {
-        $this->watchHistories = new ArrayCollection();
-        $this->playlistSubscriptions = new ArrayCollection();
-        $this->playlists = new ArrayCollection();
-        $this->subscriptionHistorie = new ArrayCollection();
-        $this->comments = new ArrayCollection();
+        $this->current_subscription_id = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,196 +78,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, WatchHistory>
+     * @return Collection<int, subscription>
      */
-    public function getWatchHistories(): Collection
+    public function getCurrentSubscriptionId(): Collection
     {
-        return $this->watchHistories;
+        return $this->current_subscription_id;
     }
 
-    public function addWatchHistory(WatchHistory $medium): static
+    public function addCurrentSubscriptionId(subscription $currentSubscriptionId): static
     {
-        if (!$this->watchHistories->contains($medium)) {
-            $this->watchHistories->add($medium);
-            $medium->setViewer($this);
+        if (!$this->current_subscription_id->contains($currentSubscriptionId)) {
+            $this->current_subscription_id->add($currentSubscriptionId);
+            $currentSubscriptionId->setSubscriber($this);
         }
 
         return $this;
     }
 
-    public function removeWatchHistory(WatchHistory $medium): static
+    public function removeCurrentSubscriptionId(subscription $currentSubscriptionId): static
     {
-        if ($this->watchHistories->removeElement($medium)) {
+        if ($this->current_subscription_id->removeElement($currentSubscriptionId)) {
             // set the owning side to null (unless already changed)
-            if ($medium->getViewer() === $this) {
-                $medium->setViewer(null);
+            if ($currentSubscriptionId->getSubscriber() === $this) {
+                $currentSubscriptionId->setSubscriber(null);
             }
         }
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, PlaylistSubscription>
-     */
-    public function getPlaylistSubscriptions(): Collection
-    {
-        return $this->playlistSubscriptions;
-    }
-
-    public function addPlaylistSubscription(PlaylistSubscription $playlistSubscription): static
-    {
-        if (!$this->playlistSubscriptions->contains($playlistSubscription)) {
-            $this->playlistSubscriptions->add($playlistSubscription);
-            $playlistSubscription->setSubscriber($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlaylistSubscription(PlaylistSubscription $playlistSubscription): static
-    {
-        if ($this->playlistSubscriptions->removeElement($playlistSubscription)) {
-            // set the owning side to null (unless already changed)
-            if ($playlistSubscription->getSubscriber() === $this) {
-                $playlistSubscription->setSubscriber(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Playlist>
-     */
-    public function getPlaylists(): Collection
-    {
-        return $this->playlists;
-    }
-
-    public function addPlaylist(Playlist $playlist): static
-    {
-        if (!$this->playlists->contains($playlist)) {
-            $this->playlists->add($playlist);
-            $playlist->setCreator($this);
-        }
-
-        return $this;
-    }
-
-    public function removePlaylist(Playlist $playlist): static
-    {
-        if ($this->playlists->removeElement($playlist)) {
-            // set the owning side to null (unless already changed)
-            if ($playlist->getCreator() === $this) {
-                $playlist->setCreator(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, SubscriptionHistory>
-     */
-    public function getSubscriptionHistorie(): Collection
-    {
-        return $this->subscriptionHistorie;
-    }
-
-    public function addSubscriptionHistorie(SubscriptionHistory $subscriptionHistorie): static
-    {
-        if (!$this->subscriptionHistorie->contains($subscriptionHistorie)) {
-            $this->subscriptionHistorie->add($subscriptionHistorie);
-            $subscriptionHistorie->setSubscriber($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubscriptionHistorie(SubscriptionHistory $subscriptionHistorie): static
-    {
-        if ($this->subscriptionHistorie->removeElement($subscriptionHistorie)) {
-            // set the owning side to null (unless already changed)
-            if ($subscriptionHistorie->getSubscriber() === $this) {
-                $subscriptionHistorie->setSubscriber(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Comment>
-     */
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(Comment $comment): static
-    {
-        if (!$this->comments->contains($comment)) {
-            $this->comments->add($comment);
-            $comment->setPublisher($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): static
-    {
-        if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
-            if ($comment->getPublisher() === $this) {
-                $comment->setPublisher(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getAccountStatus(): ?UserAccountStatusEnum
-    {
-        return $this->accountStatus;
-    }
-
-    public function setAccountStatus(UserAccountStatusEnum $accountStatus): static
-    {
-        $this->accountStatus = $accountStatus;
-
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
-        return $this->roles ?? ['ROLE_USER'];
-    }
-
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    public function eraseCredentials(): void
-    {
-        $this->plainPassword = '';
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
-    }
-
-    public function getPlainPassword(): string
-    {
-        return $this->plainPassword;
-    }
-
-    public function setPlainPassword(string $plainPassword): void
-    {
-        $this->plainPassword = $plainPassword;
     }
 }

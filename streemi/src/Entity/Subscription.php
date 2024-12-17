@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\SubscriptionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SubscriptionRepository::class)]
@@ -19,30 +17,14 @@ class Subscription
     private ?string $name = null;
 
     #[ORM\Column]
-    private ?int $price = null;
+    private ?float $price = null;
 
     #[ORM\Column]
-    private ?int $durationInMonths = null;
+    private ?int $duration_in_months = null;
 
-    /**
-     * @var Collection<int, SubscriptionHistory>
-     */
-    #[ORM\OneToMany(targetEntity: SubscriptionHistory::class, mappedBy: 'subscription')]
-    private Collection $subscriptionHistories;
-
-    #[ORM\Column(length: 15, nullable: true)]
-    private ?string $quality = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $catchphrase = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $description = null;
-
-    public function __construct()
-    {
-        $this->subscriptionHistories = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(inversedBy: 'current_subscription_id')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $subscriber = null;
 
     public function getId(): ?int
     {
@@ -61,12 +43,12 @@ class Subscription
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    public function setPrice(int $price): static
+    public function setPrice(float $price): static
     {
         $this->price = $price;
 
@@ -75,78 +57,24 @@ class Subscription
 
     public function getDurationInMonths(): ?int
     {
-        return $this->durationInMonths;
+        return $this->duration_in_months;
     }
 
-    public function setDurationInMonths(int $durationInMonths): static
+    public function setDurationInMonths(int $duration_in_months): static
     {
-        $this->durationInMonths = $durationInMonths;
+        $this->duration_in_months = $duration_in_months;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, SubscriptionHistory>
-     */
-    public function getSubscriptionHistories(): Collection
+    public function getSubscriber(): ?User
     {
-        return $this->subscriptionHistories;
+        return $this->subscriber;
     }
 
-    public function addSubscriptionHistory(SubscriptionHistory $subscriptionHistory): static
+    public function setSubscriber(?User $subscriber): static
     {
-        if (!$this->subscriptionHistories->contains($subscriptionHistory)) {
-            $this->subscriptionHistories->add($subscriptionHistory);
-            $subscriptionHistory->setSubscription($this);
-        }
-
-        return $this;
-    }
-
-    public function removeSubscriptionHistory(SubscriptionHistory $subscriptionHistory): static
-    {
-        if ($this->subscriptionHistories->removeElement($subscriptionHistory)) {
-            // set the owning side to null (unless already changed)
-            if ($subscriptionHistory->getSubscription() === $this) {
-                $subscriptionHistory->setSubscription(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getQuality(): ?string
-    {
-        return $this->quality;
-    }
-
-    public function setQuality(?string $quality): static
-    {
-        $this->quality = $quality;
-
-        return $this;
-    }
-
-    public function getCatchphrase(): ?string
-    {
-        return $this->catchphrase;
-    }
-
-    public function setCatchphrase(?string $catchphrase): static
-    {
-        $this->catchphrase = $catchphrase;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): static
-    {
-        $this->description = $description;
+        $this->subscriber = $subscriber;
 
         return $this;
     }
