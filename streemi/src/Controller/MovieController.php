@@ -2,18 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Media;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 class MovieController extends AbstractController
 {
-    #[Route('/movie', name: 'app_movie')]
-    public function index(): JsonResponse
+    #[Route(path: '/media/{id}', name: 'page_detail_media')]
+    public function detail(Media $media): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/MovieController.php',
+        return $this->render('movie/detail.html.twig', [
+            'media' => $media
         ]);
     }
 }
