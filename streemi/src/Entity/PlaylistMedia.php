@@ -16,23 +16,16 @@ class PlaylistMedia
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $added_at = null;
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $addedAt = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: Playlist::class, inversedBy: 'playlistMedia')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?playlist $playlist_id = null;
+    private ?Playlist $playlist = null;
 
-    /**
-     * @var Collection<int, media>
-     */
-    #[ORM\ManyToMany(targetEntity: media::class)]
-    private Collection $media_id;
-
-    public function __construct()
-    {
-        $this->media_id = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(targetEntity: Media::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Media $media = null;
 
     public function getId(): ?int
     {
@@ -41,48 +34,36 @@ class PlaylistMedia
 
     public function getAddedAt(): ?\DateTimeInterface
     {
-        return $this->added_at;
+        return $this->addedAt;
     }
 
-    public function setAddedAt(?\DateTimeInterface $added_at): static
+    public function setAddedAt(?\DateTimeInterface $addedAt): self
     {
-        $this->added_at = $added_at;
+        $this->addedAt = $addedAt;
 
         return $this;
     }
 
-    public function getPlaylistId(): ?playlist
+    public function getPlaylist(): ?Playlist
     {
-        return $this->playlist_id;
+        return $this->playlist;
     }
 
-    public function setPlaylistId(?playlist $playlist_id): static
+    public function setPlaylist(?Playlist $playlist): self
     {
-        $this->playlist_id = $playlist_id;
+        $this->playlist = $playlist;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, media>
-     */
-    public function getMediaId(): Collection
+    public function getMedia(): ?Media
     {
-        return $this->media_id;
+        return $this->media;
     }
 
-    public function addMediaId(media $mediaId): static
+    public function setMedia(?Media $media): self
     {
-        if (!$this->media_id->contains($mediaId)) {
-            $this->media_id->add($mediaId);
-        }
-
-        return $this;
-    }
-
-    public function removeMediaId(media $mediaId): static
-    {
-        $this->media_id->removeElement($mediaId);
+        $this->media = $media;
 
         return $this;
     }

@@ -63,12 +63,19 @@ use Doctrine\ORM\Mapping\InheritanceType;
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'medias')]
     private Collection $categories;
 
-    
+    /**
+ * @var Collection<int, Language>
+ */
+#[ORM\ManyToMany(targetEntity: Language::class, inversedBy: 'medias')]
+private Collection $languages;
+
     public function __construct()
     {
         $this->watchHistories = new ArrayCollection();
         $this->comment = new ArrayCollection();
         $this->categories = new ArrayCollection();
+        $this->languages = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -236,6 +243,30 @@ use Doctrine\ORM\Mapping\InheritanceType;
     {
         return $this->categories;
     }
+    /**
+ * @return Collection<int, Language>
+ */
+public function getLanguages(): Collection
+{
+    return $this->languages;
+}
+
+public function addLanguage(Language $language): static
+{
+    if (!$this->languages->contains($language)) {
+        $this->languages->add($language);
+    }
+
+    return $this;
+}
+
+public function removeLanguage(Language $language): static
+{
+    $this->languages->removeElement($language);
+
+    return $this;
+}
+
 
     public function addCategory(Category $category): static
     {
