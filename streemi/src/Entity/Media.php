@@ -57,10 +57,13 @@ use Doctrine\ORM\Mapping\InheritanceType;
     #[ORM\ManyToOne(inversedBy: 'media_id')]
     private ?CategoryMedia $categoryMedia = null;
 
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: "media")]
-    #[ORM\JoinTable(name: "category_media_category")]
-    private $categories;
+    /**
+     * @var Collection<int, Category>
+     */
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'medias')]
+    private Collection $categories;
 
+    
     public function __construct()
     {
         $this->watchHistories = new ArrayCollection();
@@ -222,6 +225,30 @@ use Doctrine\ORM\Mapping\InheritanceType;
     public function setCategoryMedia(?CategoryMedia $categoryMedia): static
     {
         $this->categoryMedia = $categoryMedia;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Category>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Category $category): static
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories->add($category);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Category $category): static
+    {
+        $this->categories->removeElement($category);
 
         return $this;
     }
