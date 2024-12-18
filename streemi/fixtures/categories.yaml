@@ -1,0 +1,12 @@
+App\Entity\Category:
+    category_1:
+        name: "Action"
+        label: "Films d'action"
+
+    category_2:
+        name: "Aventure"
+        label: "Films d'aventure"
+
+    category_3:
+        name: "Comédie"
+        label: "Films comiques"
